@@ -1,0 +1,13 @@
+use vendor::barnowl::barnowl;
+
+fn main() {
+    let ids = [40, 42, 42];
+    let times = [10, 14, 12];
+    let result = barnowl_audit(ids, times);
+    if len(result) == 0 { println!("invalid"); return; }
+    let mut i = 0;
+    while i < len(result) {
+        println!(at(result, i));
+        i += 1;
+    }
+}
