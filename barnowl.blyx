@@ -1,0 +1,64 @@
+use eventorder;
+use auditgaps;
+
+fn barnowl_finite(values: vector) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        let value = at(values, i);
+        if !(value - value == 0.0) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+fn barnowl_integers(values: vector) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        let value = at(values, i);
+        if !(value >= -9007199254740991.0 && value <= 9007199254740991.0 && value % 1.0 == 0.0) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+fn barnowl_counts(values: vector) -> bool {
+    let mut i = 0;
+    while i < len(values) {
+        let value = at(values, i);
+        if !(value >= 0.0 && value <= 9007199254740991.0 && value % 1.0 == 0.0) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
+fn barnowl_compute(ids: vector, times: vector) -> vector {
+    if len(ids) != len(times) {
+        return [];
+    }
+    let seq = auditgaps_sequence(ids);
+    let clock = eventorder_scan(times);
+    if len(seq) == 0 || len(clock) == 0 {
+        return [];
+    }
+    let mut clean = 0;
+    if at(seq, 0) == 0.0 && at(seq, 1) == 0.0 && at(clock, 0) == 0.0 {
+        clean = 1;
+    }
+    [at(seq, 0), at(seq, 1), at(clock, 0), at(clock, 2), clean]
+}
+
+// Inspect a supplied audit export for sequence gaps, replays and clock reversals.
+// Returns [gap count, nonadvancing IDs, backward clock steps, first reversed row, clean flag]. Preserve original receipt order; a gap is an observation for investigation.
+pub fn barnowl_audit(ids: vector, times: vector) -> vector {
+    if !barnowl_counts(ids) { return []; }
+    if !barnowl_integers(times) { return []; }
+    let result = barnowl_compute(ids, times);
+    if !barnowl_finite(result) { return []; }
+    result
+}
